@@ -1,1 +1,1 @@
-# Hitachy-Yutaki-Home-Assistant
+# Hitachy Yutaki Home Assistant
