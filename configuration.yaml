@@ -1,0 +1,119 @@
+mqtt:
+  sensor:
+   - name : Hitachi
+     unique_id: hitachi_status
+     icon: mdi:transfer-right
+     state_topic: "P1P2/R/131"
+     value_template: >
+        {% set parts = value.split(" ") %}
+        {% set list = namespace(numbers=[]) %}
+        {% if (parts | count) >= 4 and (parts[4] | count) == 96 and parts[4].startswith("490030") %}
+        {% set data = parts[4] %}
+        {% for i in range(0, (int)((data | count) / 2)) %}
+        {% set index = i * 2 %}
+        {% set combine = data[index] + "" + data[index+1] %}
+        {% set list.numbers = list.numbers + [combine | int(combine,16)] %}
+        {% endfor %}
+        {{ list.numbers | to_json }}
+        {% else %}
+        {{ states('sensor.hitachi') }}
+        {% endif %}
+
+template:
+  - sensor:
+      - name: "Hitachi TWI"
+        unique_id: hitachi_twi
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.10 }}
+      - name: "Hitachi TWO"
+        unique_id: hitachi_two
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.11 }}
+      - name: "Hitachi HPTWO"
+        unique_id: hitachi_hptwo
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.14 }}
+      - name: "Hitachi HPTWO"
+        unique_id: hitachi_hptwo
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.14 }}
+      - name: "Hitachi Boiler temp"
+        unique_id: hitachi_boiler_temp
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.15 }}
+      - name: "Hitachi Outside temp"
+        unique_id: hitachi_outside_temp
+        unit_of_measurement: '°C'
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.17 }}
+      - name: "Hitachi Outside temp avg"
+        unique_id: hitachi_outside_temp_avg
+        icon: mdi:temperature-celsius
+        unit_of_measurement: '°C'
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.19 }}
+      - name: "Hitachi Tset"
+        unique_id: hitachi_tset
+        icon: mdi:temperature-celsius
+        unit_of_measurement: '°C'
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.22 }}
+      - name: "Hitachi Operation status"
+        unique_id: hitachi_operation_status
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.25 }}
+      - name: "Hitachi Operation status text"
+        unique_id: hitachi_operation_status_text
+        icon: mdi:temperature-celsius
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {% set status = list.25 %}
+          {% if status == 0 %}
+          Off
+          {% elif status == 1 %}
+          Cool Demand – OFF
+          {% elif status == 4 %}
+          Heat Demand-OFF
+          {% elif status == 5 %}
+          Heat Thermo-OFF
+          {% elif status == 6 %}
+          Heat Thermo-ON
+          {% elif status == 7 %}
+          DHW-OFF
+          {% elif status == 8 %}
+          DHW-ON
+          {% elif status == 9 %}
+          SWP-OFF
+          {% elif status == 10 %}
+          SWP-ON
+          {% elif status == 11 %}
+          Alarm
+          {% endif %}
+      - name: "Hitachi HPWP"
+        unique_id: hitachi_hpwp
+        icon: mdi:temperature-celsius
+        unit_of_measurement: '%'
+        state: >
+          {% set list = (states('sensor.hitachi') | from_json) %}
+          {{ list.33 }}
